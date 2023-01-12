@@ -1,18 +1,16 @@
 const { initializeApp, applicationDefault } = require("firebase-admin/app");
 initializeApp({ credential: applicationDefault() });
 const { getAuth } = require("firebase-admin/auth");
+const authMiddleWare = require("firebase-auth-express-middleware");
 const firebaseAuth = getAuth();
-const bodyParser = require("body-parser");
 
 express = require("express");
 const app = express();
+
+app.use(authMiddleWare.authn(firebaseAuth));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 require("./routes/user.routes")(app);
-const authMiddleWare = require("firebase-auth-express-middleware");
-
-app.use(express.json());
-//app.use(authMiddleWare.authn(firebaseAuth));
 
 app.get("/user", (req, res) => {
 	console.log("Decoded token: ", req.authenticatedUser);

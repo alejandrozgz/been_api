@@ -2,16 +2,16 @@ const User = require("../database/models").User;
 
 exports.create = async (req, res, next) => {
 	try {
-		const { username, email } = req.body;
+		const { id, username, email, method } = req.body;
 		// Validate user input
-		if (!(username && email)) {
-			res.status(400).send("All input is required");
+		if (!(id && username && email && method)) {
+			return res.status(400).send("All input is required");
 		}
 
 		// check if user already exist
 		// Validate if user exist in our database
 		const oldUser = await User.findOne({
-			where: { username: username },
+			where: { id: id },
 		});
 
 		if (oldUser) {
@@ -20,8 +20,10 @@ exports.create = async (req, res, next) => {
 
 		// Create user in our database
 		const user = await User.create({
+			id,
 			username,
 			email: email.toLowerCase(),
+			method,
 		});
 
 		// return new user
@@ -33,25 +35,25 @@ exports.create = async (req, res, next) => {
 
 exports.findOne = async (req, res, next) => {
 	try {
-		const { username, email } = req.body;
+		const { id } = req.params;
 
 		// Validate user input
-		if (!(username && password)) {
-			res.status(400).send("All input is required");
+		if (!id) {
+			return res.status(400).send("All input is required");
 		}
 
 		// Validate if user exist in our database
 		const user = await User.findOne({
-			where: { username: username },
+			where: { id: id },
 		});
 
-		if (!oldUser) {
+		if (!user) {
 			return res.status(409).send("User NOT Exist. Please SignUp");
 		}
 
 		res.status(200).json(user);
 	} catch (e) {
-		console.log(err);
+		console.log(e);
 	}
 };
 
